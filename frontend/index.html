@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decentralized Crowdfunding Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🚀 Decentralized Crowdfunding</h1>
+            <p class="subtitle">Built on Ethereum Testnet</p>
+            
+            <div id="wallet-info">
+                <button id="connect-wallet" class="btn btn-primary">Connect MetaMask</button>
+                <div id="account-info" style="display: none;">
+                    <p><strong>Connected:</strong> <span id="account-address"></span></p>
+                    <p><strong>Network:</strong> <span id="network-name"></span></p>
+                    <p><strong>ETH Balance:</strong> <span id="eth-balance"></span> ETH</p>
+                    <p><strong>CRT Balance:</strong> <span id="token-balance"></span> CRT</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Create Campaign Section -->
+            <section class="card">
+                <h2>Create Campaign</h2>
+                <form id="create-campaign-form">
+                    <div class="form-group">
+                        <label for="campaign-title">Campaign Title</label>
+                        <input type="text" id="campaign-title" required 
+                               placeholder="Enter your campaign title">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="funding-goal">Funding Goal (ETH)</label>
+                        <input type="number" id="funding-goal" step="0.01" min="0.01" required
+                               placeholder="0.1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duration">Duration (Days)</label>
+                        <input type="number" id="duration" min="1" required
+                               placeholder="30">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Create Campaign</button>
+                </form>
+            </section>
+
+            <!-- Campaign List Section -->
+            <section class="card">
+                <h2>Active Campaigns</h2>
+                <button id="refresh-campaigns" class="btn btn-secondary">Refresh Campaigns</button>
+                <div id="campaigns-list">
+                    <p class="info-text">Connect your wallet to view campaigns</p>
+                </div>
+            </section>
+
+            <!-- Transaction Status -->
+            <section class="card" id="transaction-status" style="display: none;">
+                <h3>Transaction Status</h3>
+                <div id="status-message"></div>
+                <div id="transaction-link"></div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>⚠️ <strong>Educational Purpose Only</strong> - Use testnet ETH only</p>
+            <p>Contract: <span id="contract-address"></span></p>
+        </footer>
+    </div>
+
+    <!-- Campaign Card Template -->
+    <template id="campaign-template">
+        <div class="campaign-card">
+            <h3 class="campaign-title"></h3>
+            <div class="campaign-details">
+                <p><strong>Creator:</strong> <span class="campaign-creator"></span></p>
+                <p><strong>Goal:</strong> <span class="campaign-goal"></span> ETH</p>
+                <p><strong>Raised:</strong> <span class="campaign-raised"></span> ETH</p>
+                <p><strong>Progress:</strong> <span class="campaign-progress"></span>%</p>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <p><strong>Deadline:</strong> <span class="campaign-deadline"></span></p>
+                <p><strong>Status:</strong> <span class="campaign-status"></span></p>
+                <p><strong>Your Contribution:</strong> <span class="user-contribution"></span> ETH</p>
+            </div>
+            <div class="campaign-actions">
+                <input type="number" class="contribute-amount" step="0.01" min="0.01" 
+                       placeholder="Amount in ETH">
+                <button class="btn btn-primary contribute-btn">Contribute</button>
+                <button class="btn btn-secondary finalize-btn" style="display: none;">Finalize</button>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.1/dist/web3.min.js"></script>
+    <script src="js/web3-config.js"></script>
+    <script src="js/contract-abi.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>"},{

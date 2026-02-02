@@ -1,0 +1,31 @@
+{
+  "name": "blockchain-crowdfunding",
+  "version": "1.0.0",
+  "description": "Decentralized Crowdfunding Platform with ERC-20 Reward Tokens",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "deploy:holesky": "hardhat run scripts/deploy.js --network holesky",
+    "node": "hardhat node"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "crowdfunding",
+    "solidity",
+    "web3",
+    "dapp"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
+}

@@ -1,0 +1,308 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header Styles */
+header {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+#wallet-info {
+    margin-top: 20px;
+}
+
+#account-info {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+#account-info p {
+    margin: 10px 0;
+    color: #333;
+}
+
+#account-address {
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #667eea;
+}
+
+/* Card Styles */
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.card h2 {
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #667eea;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Button Styles */
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Campaign Card Styles */
+.campaign-card {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border-left: 5px solid #667eea;
+}
+
+.campaign-title {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.5em;
+}
+
+.campaign-details p {
+    margin: 8px 0;
+    color: #555;
+}
+
+.campaign-details strong {
+    color: #333;
+}
+
+.campaign-creator {
+    font-family: monospace;
+    font-size: 0.85em;
+    color: #667eea;
+}
+
+/* Progress Bar */
+.progress-bar {
+    width: 100%;
+    height: 25px;
+    background: #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.5s ease;
+    border-radius: 12px;
+}
+
+/* Campaign Actions */
+.campaign-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.contribute-amount {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+}
+
+.contribute-amount:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Status Badges */
+.status-active {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.status-ended {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.status-successful {
+    color: #667eea;
+    font-weight: 600;
+}
+
+/* Transaction Status */
+#transaction-status {
+    background: #fff3cd;
+    border-left: 5px solid #ffc107;
+}
+
+#status-message {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#transaction-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+#transaction-link a:hover {
+    text-decoration: underline;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    color: white;
+    margin-top: 30px;
+    padding: 20px;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+#contract-address {
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+/* Info Text */
+.info-text {
+    text-align: center;
+    color: #666;
+    padding: 40px;
+    font-style: italic;
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+    }
+    
+    .campaign-actions {
+        flex-direction: column;
+    }
+    
+    .contribute-amount {
+        width: 100%;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
