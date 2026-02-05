@@ -174,6 +174,13 @@ const App = {
     async initContract() {
         const web3 = Web3Config.getWeb3();
         
+        // Check if contract address is set
+        if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === '0xYourContractAddressHere') {
+            console.error('Contract address not set!');
+            alert('⚠️ Contract not deployed yet!\n\nPlease follow these steps:\n\n1. Deploy the contract: npm run deploy:local (or deploy:sepolia)\n2. Copy the deployed contract address\n3. Update CONTRACT_ADDRESS in frontend/js/contract-abi.js\n4. Refresh this page\n\nSee INSTRUCTIONS.md for detailed setup guide.');
+            return;
+        }
+        
         // Create contract instance
         this.contract = new web3.eth.Contract(CROWDFUNDING_ABI, CONTRACT_ADDRESS);
         
@@ -190,6 +197,7 @@ const App = {
                 Web3Config.formatAddress(tokenAddress);
         } catch (error) {
             console.error('Error initializing token contract:', error);
+            alert('Error connecting to smart contract. Please make sure:\n\n1. You deployed the contract\n2. The contract address in contract-abi.js is correct\n3. You are connected to the same network where you deployed');
         }
     },
     
@@ -201,6 +209,11 @@ const App = {
         
         if (!Web3Config.isConnected()) {
             alert('Please connect your wallet first!');
+            return;
+        }
+        
+        if (!this.contract) {
+            alert('Smart contract not initialized. Please deploy the contract first and update the contract address in contract-abi.js');
             return;
         }
         
@@ -456,8 +469,24 @@ const App = {
         
         // Calculate progress
         const progress = (parseFloat(raisedETH) / parseFloat(goalETH)) * 100;
+        const progressCapped = Math.min(progress, 100); // Cap display at 100%
+        const isOverfunded = progress > 100;
+        
         card.querySelector('.progress-percentage').textContent = progress.toFixed(2) + '%';
-        card.querySelector('.progress-fill').style.width = Math.min(progress, 100) + '%';
+        const progressFill = card.querySelector('.progress-fill');
+        progressFill.style.width = progressCapped + '%';
+        
+        // Change progress bar color if overfunded
+        if (isOverfunded && campaign.isActive) {
+            progressFill.style.background = 'linear-gradient(90deg, #28a745 0%, #20c997 100%)';
+            
+            // Add overfunding notice
+            const progressSection = card.querySelector('.progress-section');
+            const overfundNotice = document.createElement('p');
+            overfundNotice.style.cssText = 'font-size: 12px; color: #28a745; font-weight: 600; margin-top: 8px; margin-bottom: 0;';
+            overfundNotice.textContent = '🎉 Campaign exceeded its goal! Overfunding accepted.';
+            progressSection.appendChild(overfundNotice);
+        }
         
         // Format deadline
         const deadlineDate = new Date(campaign.deadline * 1000);
@@ -479,6 +508,10 @@ const App = {
         } else if (!campaign.isActive) {
             status = 'Ended';
             badgeClass = 'badge-ended';
+        } else if (isOverfunded) {
+            // Active and overfunded
+            status = 'Overfunded';
+            badgeClass = 'badge-goal-met';
         }
         
         badge.textContent = status;
@@ -487,21 +520,25 @@ const App = {
         // Setup contribute button
         const contributeBtn = card.querySelector('.contribute-btn');
         const contributeInput = card.querySelector('.contribute-amount');
+        const finalizeBtn = card.querySelector('.finalize-btn');
         
         if (campaign.isActive && !campaign.finalized) {
+            // Campaign is active - show contribute option
             contributeBtn.addEventListener('click', () => 
                 this.handleContribute(campaign.id, contributeInput.value));
-        } else {
-            contributeBtn.disabled = true;
-            contributeInput.disabled = true;
-        }
-        
-        // Setup finalize button
-        const finalizeBtn = card.querySelector('.finalize-btn');
-        if (!campaign.isActive && !campaign.finalized) {
+            finalizeBtn.style.display = 'none';
+        } else if (!campaign.isActive && !campaign.finalized) {
+            // Campaign ended but not finalized - show finalize button only
+            contributeBtn.style.display = 'none';
+            contributeInput.style.display = 'none';
             finalizeBtn.style.display = 'inline-block';
             finalizeBtn.addEventListener('click', () => 
                 this.handleFinalize(campaign.id));
+        } else {
+            // Campaign finalized - hide all action buttons
+            contributeBtn.style.display = 'none';
+            contributeInput.style.display = 'none';
+            finalizeBtn.style.display = 'none';
         }
         
         return card;

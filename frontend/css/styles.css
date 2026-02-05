@@ -514,6 +514,10 @@ body {
     gap: 10px;
 }
 
+.campaign-footer .finalize-btn {
+    flex: 1;
+}
+
 .contribute-amount {
     flex: 1;
     padding: 10px 15px;
