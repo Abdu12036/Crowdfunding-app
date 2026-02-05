@@ -72,8 +72,8 @@ This application enables users to:
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
-cd blockchain-crowdfunding
+git clone <this-repository-url>
+cd Crowdfunding-app
 ```
 
 ### 2. Install Dependencies
