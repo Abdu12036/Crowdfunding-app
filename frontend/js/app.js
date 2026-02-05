@@ -7,6 +7,13 @@ const App = {
     contract: null,
     tokenContract: null,
     campaigns: [],
+    currentSection: 'dashboard',
+    userStats: {
+        totalContributed: 0,
+        campaignsParticipated: 0,
+        campaignsCreated: 0,
+        activeCampaigns: 0
+    },
     
     /**
      * Initialize the application
@@ -32,13 +39,110 @@ const App = {
         document.getElementById('connect-wallet').addEventListener('click', 
             () => this.connectWallet());
         
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click',
+            () => this.handleLogout());
+        
+        // Create campaign buttons
+        document.getElementById('create-campaign-btn').addEventListener('click',
+            () => this.showCreateCampaignModal());
+        document.getElementById('dashboard-create-btn').addEventListener('click',
+            () => this.showCreateCampaignModal());
+        
         // Create campaign form
         document.getElementById('create-campaign-form').addEventListener('submit', 
             (e) => this.handleCreateCampaign(e));
         
+        // Modal close
+        document.querySelector('.modal-close').addEventListener('click',
+            () => this.hideCreateCampaignModal());
+        
+        // Close modal on outside click
+        document.getElementById('create-campaign-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'create-campaign-modal') {
+                this.hideCreateCampaignModal();
+            }
+        });
+        
         // Refresh campaigns button
         document.getElementById('refresh-campaigns').addEventListener('click', 
             () => this.loadCampaigns());
+        
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = item.dataset.section;
+                this.navigateToSection(section);
+            });
+        });
+    },
+    
+    /**
+     * Navigate to section
+     */
+    navigateToSection(section) {
+        // Update navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        document.querySelector(`[data-section="${section}"]`).classList.add('active');
+        
+        // Update content
+        document.querySelectorAll('.content-section').forEach(sec => {
+            sec.classList.remove('active');
+        });
+        document.getElementById(`${section}-section`).classList.add('active');
+        
+        // Update page title
+        const titles = {
+            'dashboard': 'Dashboard',
+            'browse': 'Browse Campaigns',
+            'contributions': 'My Contributions',
+            'my-campaigns': 'My Campaigns',
+            'rewards': 'My Rewards'
+        };
+        document.getElementById('page-title').textContent = titles[section] || section;
+        
+        this.currentSection = section;
+        
+        // Load section-specific data
+        if (section === 'browse') {
+            this.loadCampaigns();
+        } else if (section === 'contributions') {
+            this.loadMyContributions();
+        } else if (section === 'my-campaigns') {
+            this.loadMyCampaigns();
+        }
+    },
+    
+    /**
+     * Show create campaign modal
+     */
+    showCreateCampaignModal() {
+        if (!Web3Config.isConnected()) {
+            alert('Please connect your wallet first!');
+            return;
+        }
+        document.getElementById('create-campaign-modal').style.display = 'block';
+    },
+    
+    /**
+     * Hide create campaign modal
+     */
+    hideCreateCampaignModal() {
+        document.getElementById('create-campaign-modal').style.display = 'none';
+        document.getElementById('create-campaign-form').reset();
+    },
+    
+    /**
+     * Handle logout
+     */
+    handleLogout() {
+        // This is a UI logout - actual wallet connection remains
+        document.getElementById('connect-wallet').style.display = 'block';
+        document.getElementById('logout-btn').style.display = 'none';
+        this.navigateToSection('dashboard');
     },
     
     /**
@@ -50,18 +154,17 @@ const App = {
         if (connected) {
             // Update UI
             document.getElementById('connect-wallet').style.display = 'none';
-            document.getElementById('account-info').style.display = 'block';
+            document.getElementById('logout-btn').style.display = 'block';
             
             await Web3Config.updateAccountInfo();
             
             // Initialize contract
             await this.initContract();
             
-            // Load campaigns
+            // Load campaigns and stats
             await this.loadCampaigns();
-            
-            // Update token balance
             await this.updateTokenBalance();
+            await this.calculateUserStats();
         }
     },
     
@@ -76,15 +179,15 @@ const App = {
         
         console.log('Contract initialized at:', CONTRACT_ADDRESS);
         
-        // Display contract address
-        document.getElementById('contract-address').textContent = 
-            Web3Config.formatAddress(CONTRACT_ADDRESS);
-        
         // Get token address and initialize token contract
         try {
             const tokenAddress = await this.contract.methods.getRewardTokenAddress().call();
             this.tokenContract = new web3.eth.Contract(REWARD_TOKEN_ABI, tokenAddress);
             console.log('Token contract initialized at:', tokenAddress);
+            
+            // Update token contract address in UI
+            document.getElementById('token-contract').textContent = 
+                Web3Config.formatAddress(tokenAddress);
         } catch (error) {
             console.error('Error initializing token contract:', error);
         }
@@ -131,11 +234,14 @@ const App = {
                 receipt.transactionHash
             );
             
-            // Clear form
-            document.getElementById('create-campaign-form').reset();
+            // Hide modal and clear form
+            this.hideCreateCampaignModal();
             
-            // Reload campaigns
-            setTimeout(() => this.loadCampaigns(), 2000);
+            // Reload campaigns and stats
+            setTimeout(() => {
+                this.loadCampaigns();
+                this.calculateUserStats();
+            }, 2000);
             
         } catch (error) {
             console.error('Error creating campaign:', error);
@@ -214,6 +320,100 @@ const App = {
     },
     
     /**
+     * Calculate user statistics
+     */
+    async calculateUserStats() {
+        if (!this.contract || this.campaigns.length === 0) return;
+        
+        const userAddress = Web3Config.getAccount();
+        let totalContributed = 0;
+        let campaignsParticipated = 0;
+        let campaignsCreated = 0;
+        let activeCampaigns = 0;
+        
+        this.campaigns.forEach(campaign => {
+            // Count active campaigns
+            if (campaign.isActive && !campaign.finalized) {
+                activeCampaigns++;
+            }
+            
+            // Count user's campaigns
+            if (campaign.creator.toLowerCase() === userAddress.toLowerCase()) {
+                campaignsCreated++;
+            }
+            
+            // Count participation and contributions
+            if (campaign.userContribution && campaign.userContribution !== '0') {
+                campaignsParticipated++;
+                const contributionETH = parseFloat(Web3Config.fromWei(campaign.userContribution));
+                totalContributed += contributionETH;
+            }
+        });
+        
+        // Update stats object
+        this.userStats = {
+            totalContributed,
+            campaignsParticipated,
+            campaignsCreated,
+            activeCampaigns
+        };
+        
+        // Update UI
+        document.getElementById('total-contributed').textContent = 
+            totalContributed.toFixed(4) + ' ETH';
+        document.getElementById('campaigns-participated').textContent = 
+            campaignsParticipated;
+        document.getElementById('campaigns-created').textContent = 
+            campaignsCreated;
+        document.getElementById('active-campaigns-count').textContent = 
+            activeCampaigns;
+        document.getElementById('my-campaigns-count').textContent = 
+            campaignsCreated;
+    },
+    
+    /**
+     * Load my contributions
+     */
+    async loadMyContributions() {
+        const userAddress = Web3Config.getAccount();
+        const myContributions = this.campaigns.filter(campaign => {
+            return campaign.userContribution && campaign.userContribution !== '0';
+        });
+        
+        this.displayFilteredCampaigns(myContributions, 'contributions-list');
+    },
+    
+    /**
+     * Load my campaigns
+     */
+    async loadMyCampaigns() {
+        const userAddress = Web3Config.getAccount();
+        const myCampaigns = this.campaigns.filter(campaign => {
+            return campaign.creator.toLowerCase() === userAddress.toLowerCase();
+        });
+        
+        this.displayFilteredCampaigns(myCampaigns, 'my-campaigns-list');
+    },
+    
+    /**
+     * Display filtered campaigns
+     */
+    displayFilteredCampaigns(campaigns, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        if (campaigns.length === 0) {
+            container.innerHTML = '<p class="info-text">No campaigns found</p>';
+            return;
+        }
+        
+        campaigns.forEach(campaign => {
+            const card = this.createCampaignCard(campaign);
+            container.appendChild(card);
+        });
+    },
+    
+    /**
      * Display campaigns in UI
      */
     displayCampaigns() {
@@ -229,6 +429,9 @@ const App = {
             const card = this.createCampaignCard(campaign);
             container.appendChild(card);
         });
+        
+        // Update user stats after displaying
+        this.calculateUserStats();
     },
     
     /**
@@ -240,40 +443,46 @@ const App = {
         
         // Fill in campaign details
         card.querySelector('.campaign-title').textContent = campaign.title;
-        card.querySelector('.campaign-creator').textContent = 
-            Web3Config.formatAddress(campaign.creator);
         
         const goalETH = Web3Config.fromWei(campaign.fundingGoal);
         const raisedETH = Web3Config.fromWei(campaign.amountRaised);
         const userContribETH = Web3Config.fromWei(campaign.userContribution);
         
-        card.querySelector('.campaign-goal').textContent = parseFloat(goalETH).toFixed(4);
-        card.querySelector('.campaign-raised').textContent = parseFloat(raisedETH).toFixed(4);
-        card.querySelector('.user-contribution').textContent = parseFloat(userContribETH).toFixed(4);
+        card.querySelector('.campaign-creator').textContent = 
+            Web3Config.formatAddress(campaign.creator);
+        card.querySelector('.campaign-goal').textContent = parseFloat(goalETH).toFixed(4) + ' ETH';
+        card.querySelector('.campaign-raised').textContent = parseFloat(raisedETH).toFixed(4) + ' ETH';
+        card.querySelector('.user-contribution').textContent = parseFloat(userContribETH).toFixed(4) + ' ETH';
         
         // Calculate progress
         const progress = (parseFloat(raisedETH) / parseFloat(goalETH)) * 100;
-        card.querySelector('.campaign-progress').textContent = progress.toFixed(2);
+        card.querySelector('.progress-percentage').textContent = progress.toFixed(2) + '%';
         card.querySelector('.progress-fill').style.width = Math.min(progress, 100) + '%';
         
         // Format deadline
         const deadlineDate = new Date(campaign.deadline * 1000);
         card.querySelector('.campaign-deadline').textContent = deadlineDate.toLocaleString();
         
-        // Set status
+        // Set status badge
+        const badge = card.querySelector('.campaign-badge');
         let status = 'Active';
-        let statusClass = 'status-active';
+        let badgeClass = 'badge-active';
+        
         if (campaign.finalized) {
-            status = campaign.goalReached ? 'Successful' : 'Ended';
-            statusClass = campaign.goalReached ? 'status-successful' : 'status-ended';
+            if (campaign.goalReached) {
+                status = 'Goal Met';
+                badgeClass = 'badge-goal-met';
+            } else {
+                status = 'Goal Not Met';
+                badgeClass = 'badge-ended';
+            }
         } else if (!campaign.isActive) {
-            status = 'Ended (Not Finalized)';
-            statusClass = 'status-ended';
+            status = 'Ended';
+            badgeClass = 'badge-ended';
         }
         
-        const statusSpan = card.querySelector('.campaign-status');
-        statusSpan.textContent = status;
-        statusSpan.className = 'campaign-status ' + statusClass;
+        badge.textContent = status;
+        badge.className = 'campaign-badge ' + badgeClass;
         
         // Setup contribute button
         const contributeBtn = card.querySelector('.contribute-btn');
@@ -327,11 +536,19 @@ const App = {
                 receipt.transactionHash
             );
             
-            // Reload campaigns and balances
+            // Reload campaigns, balances, and stats
             setTimeout(() => {
                 this.loadCampaigns();
                 Web3Config.updateAccountInfo();
                 this.updateTokenBalance();
+                this.calculateUserStats();
+                
+                // Refresh current section
+                if (this.currentSection === 'contributions') {
+                    this.loadMyContributions();
+                } else if (this.currentSection === 'my-campaigns') {
+                    this.loadMyCampaigns();
+                }
             }, 2000);
             
         } catch (error) {
@@ -362,8 +579,18 @@ const App = {
                 receipt.transactionHash
             );
             
-            // Reload campaigns
-            setTimeout(() => this.loadCampaigns(), 2000);
+            // Reload campaigns and stats
+            setTimeout(() => {
+                this.loadCampaigns();
+                this.calculateUserStats();
+                
+                // Refresh current section
+                if (this.currentSection === 'contributions') {
+                    this.loadMyContributions();
+                } else if (this.currentSection === 'my-campaigns') {
+                    this.loadMyCampaigns();
+                }
+            }, 2000);
             
         } catch (error) {
             console.error('Error finalizing campaign:', error);
@@ -386,8 +613,16 @@ const App = {
                 .call();
             
             const balanceFormatted = Web3Config.fromWei(balance);
+            const balanceNumber = parseFloat(balanceFormatted);
+            
+            // Format with thousands separator
+            const formattedBalance = balanceNumber.toLocaleString('en-US', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+            
             document.getElementById('token-balance').textContent = 
-                parseFloat(balanceFormatted).toFixed(2);
+                formattedBalance + ' CRT';
         } catch (error) {
             console.error('Error getting token balance:', error);
         }

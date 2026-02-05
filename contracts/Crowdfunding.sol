@@ -124,10 +124,13 @@ contract Crowdfunding {
         contributions[_campaignId][msg.sender] += msg.value;
         campaign.amountRaised += msg.value;
         
-        // Calculate reward tokens (1 token per 0.001 ETH contributed)
-        uint256 tokenAmount = (msg.value * 1000) / 1 ether;
+        // Calculate reward tokens:
+        // Reward rate: 1 CRT per 0.001 ETH contributed (i.e., 1000 CRT per 1 ETH).
+        // CRT uses 18 decimals, so mint amounts in the token's smallest units.
+        // tokenAmount (in token's smallest unit) = msg.value (wei) * 1000
+        uint256 tokenAmount = msg.value * 1000;
         
-        // Mint reward tokens to contributor
+        // Mint reward tokens to contributor (amount is already scaled by 1e18)
         rewardToken.mint(msg.sender, tokenAmount);
         
         emit ContributionReceived(_campaignId, msg.sender, msg.value);

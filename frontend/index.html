@@ -3,96 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Decentralized Crowdfunding Platform</title>
+    <title>Crowdfund dApp</title>
     <link rel="stylesheet" href="css/styles.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header>
-            <h1>🚀 Decentralized Crowdfunding</h1>
-            <p class="subtitle">Built on Ethereum Testnet</p>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="app-title">Crowdfund dApp</h2>
+            <p class="app-subtitle">Donate, Bring Ideas and Get Funded</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="#browse" class="nav-item" data-section="browse">
+                <span class="nav-icon">🔍</span>
+                <span class="nav-text">Browse Campaigns</span>
+            </a>
+            <a href="#contributions" class="nav-item" data-section="contributions">
+                <span class="nav-icon">💰</span>
+                <span class="nav-text">My Contributions</span>
+            </a>
+            <a href="#my-campaigns" class="nav-item" data-section="my-campaigns">
+                <span class="nav-icon">🏢</span>
+                <span class="nav-text">My Campaigns</span>
+                <span class="badge" id="my-campaigns-count">0</span>
+            </a>
+            <a href="#rewards" class="nav-item" data-section="rewards">
+                <span class="nav-icon">🎁</span>
+                <span class="nav-text">My Rewards</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <button id="create-campaign-btn" class="btn-create">
+                <span>+</span> Create Campaign
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1 id="page-title">Dashboard</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="balance-info">
+                    <span class="balance-label">Balance</span>
+                    <span class="balance-amount" id="header-balance">0.0000 ETH</span>
+                </div>
+                <button id="connect-wallet" class="btn-connect">Connect MetaMask</button>
+                <button id="logout-btn" class="btn-logout" style="display: none;">Logout</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="content-section active">
+            <div class="welcome-card">
+                <h2>Welcome back!</h2>
+                <p class="account-info">
+                    <span>Account: <span id="account-address">Not connected</span></span>
+                    <span>Balance: <span id="eth-balance">0.0000</span> ETH</span>
+                </p>
+                <button id="dashboard-create-btn" class="btn btn-primary">Create Campaign</button>
+            </div>
+
+            <h3 class="section-title">User Dashboard <span class="wallet-short" id="wallet-short">(Wallet: Not connected)</span></h3>
             
-            <div id="wallet-info">
-                <button id="connect-wallet" class="btn btn-primary">Connect MetaMask</button>
-                <div id="account-info" style="display: none;">
-                    <p><strong>Connected:</strong> <span id="account-address"></span></p>
-                    <p><strong>Network:</strong> <span id="network-name"></span></p>
-                    <p><strong>ETH Balance:</strong> <span id="eth-balance"></span> ETH</p>
-                    <p><strong>CRT Balance:</strong> <span id="token-balance"></span> CRT</p>
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-label">Total Contributed</div>
+                    <div class="stat-value" id="total-contributed">0.0 ETH</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">Campaigns Participated</div>
+                    <div class="stat-value" id="campaigns-participated">0</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-label">Campaigns Created</div>
+                    <div class="stat-value" id="campaigns-created">0</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-label">Active Campaigns to Contribute</div>
+                    <div class="stat-value" id="active-campaigns-count">0</div>
                 </div>
             </div>
-        </header>
+        </section>
 
-        <!-- Main Content -->
-        <main>
-            <!-- Create Campaign Section -->
-            <section class="card">
-                <h2>Create Campaign</h2>
-                <form id="create-campaign-form">
-                    <div class="form-group">
-                        <label for="campaign-title">Campaign Title</label>
-                        <input type="text" id="campaign-title" required 
-                               placeholder="Enter your campaign title">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="funding-goal">Funding Goal (ETH)</label>
-                        <input type="number" id="funding-goal" step="0.01" min="0.01" required
-                               placeholder="0.1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="duration">Duration (Days)</label>
-                        <input type="number" id="duration" min="1" required
-                               placeholder="30">
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Create Campaign</button>
-                </form>
-            </section>
+        <!-- Browse Campaigns Section -->
+        <section id="browse-section" class="content-section">
+            <div class="section-header">
+                <h3 class="section-title">All Campaigns</h3>
+                <button id="refresh-campaigns" class="btn btn-secondary">🔄 Refresh</button>
+            </div>
+            <div id="campaigns-list" class="campaigns-grid">
+                <p class="info-text">Connect your wallet to view campaigns</p>
+            </div>
+        </section>
 
-            <!-- Campaign List Section -->
-            <section class="card">
-                <h2>Active Campaigns</h2>
-                <button id="refresh-campaigns" class="btn btn-secondary">Refresh Campaigns</button>
-                <div id="campaigns-list">
-                    <p class="info-text">Connect your wallet to view campaigns</p>
+        <!-- My Contributions Section -->
+        <section id="contributions-section" class="content-section">
+            <h3 class="section-title">My Contributions</h3>
+            <div id="contributions-list" class="campaigns-grid">
+                <p class="info-text">No contributions yet</p>
+            </div>
+        </section>
+
+        <!-- My Campaigns Section -->
+        <section id="my-campaigns-section" class="content-section">
+            <h3 class="section-title">My Campaigns</h3>
+            <div id="my-campaigns-list" class="campaigns-grid">
+                <p class="info-text">No campaigns created yet</p>
+            </div>
+        </section>
+
+        <!-- My Rewards Section -->
+        <section id="rewards-section" class="content-section">
+            <h3 class="section-title">My Rewards</h3>
+            <div class="rewards-card">
+                <div class="reward-info">
+                    <div class="token-icon">🎁</div>
+                    <div class="token-details">
+                        <h4>Crowdfunding Reward Token (CRT)</h4>
+                        <p class="token-description">Earn CRT tokens by contributing to campaigns. 1000 CRT per 1 ETH contributed.</p>
+                    </div>
                 </div>
-            </section>
+                <div class="token-balance">
+                    <div class="balance-label">Your Balance</div>
+                    <div class="balance-amount" id="token-balance">0 CRT</div>
+                </div>
+                <div class="token-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Token Symbol:</span>
+                        <span class="stat-value">CRT</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Token Standard:</span>
+                        <span class="stat-value">ERC-20</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Contract:</span>
+                        <span class="stat-value" id="token-contract">N/A</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-            <!-- Transaction Status -->
-            <section class="card" id="transaction-status" style="display: none;">
-                <h3>Transaction Status</h3>
+        <!-- Transaction Status -->
+        <div id="transaction-status" class="transaction-status" style="display: none;">
+            <div class="status-content">
                 <div id="status-message"></div>
                 <div id="transaction-link"></div>
-            </section>
-        </main>
+                <button class="status-close" onclick="document.getElementById('transaction-status').style.display='none'">×</button>
+            </div>
+        </div>
+    </main>
 
-        <!-- Footer -->
-        <footer>
-            <p>⚠️ <strong>Educational Purpose Only</strong> - Use testnet ETH only</p>
-            <p>Contract: <span id="contract-address"></span></p>
-        </footer>
+    <!-- Create Campaign Modal -->
+    <div id="create-campaign-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Campaign</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="create-campaign-form">
+                <div class="form-group">
+                    <label for="campaign-title">Campaign Title</label>
+                    <input type="text" id="campaign-title" required 
+                           placeholder="Enter your campaign title">
+                </div>
+                
+                <div class="form-group">
+                    <label for="funding-goal">Funding Goal (ETH)</label>
+                    <input type="number" id="funding-goal" step="0.01" min="0.01" required
+                           placeholder="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="duration">Duration (Days)</label>
+                    <input type="number" id="duration" min="1" required
+                           placeholder="30">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-full">Create Campaign</button>
+            </form>
+        </div>
     </div>
 
     <!-- Campaign Card Template -->
     <template id="campaign-template">
         <div class="campaign-card">
-            <h3 class="campaign-title"></h3>
-            <div class="campaign-details">
-                <p><strong>Creator:</strong> <span class="campaign-creator"></span></p>
-                <p><strong>Goal:</strong> <span class="campaign-goal"></span> ETH</p>
-                <p><strong>Raised:</strong> <span class="campaign-raised"></span> ETH</p>
-                <p><strong>Progress:</strong> <span class="campaign-progress"></span>%</p>
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-                <p><strong>Deadline:</strong> <span class="campaign-deadline"></span></p>
-                <p><strong>Status:</strong> <span class="campaign-status"></span></p>
-                <p><strong>Your Contribution:</strong> <span class="user-contribution"></span> ETH</p>
+            <div class="campaign-header">
+                <h3 class="campaign-title"></h3>
+                <span class="campaign-badge"></span>
             </div>
-            <div class="campaign-actions">
+            <div class="campaign-body">
+                <div class="campaign-info">
+                    <div class="info-row">
+                        <span class="info-label">Creator:</span>
+                        <span class="campaign-creator"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Goal:</span>
+                        <span class="campaign-goal"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Raised:</span>
+                        <span class="campaign-raised"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Deadline:</span>
+                        <span class="campaign-deadline"></span>
+                    </div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span class="progress-label">Progress</span>
+                        <span class="progress-percentage"></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="contribution-info">
+                    <span class="info-label">Your Contribution:</span>
+                    <span class="user-contribution"></span>
+                </div>
+            </div>
+            <div class="campaign-footer">
                 <input type="number" class="contribute-amount" step="0.01" min="0.01" 
                        placeholder="Amount in ETH">
                 <button class="btn btn-primary contribute-btn">Contribute</button>
@@ -101,9 +248,8 @@
         </div>
     </template>
 
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.1/dist/web3.min.js"></script>
     <script src="js/web3-config.js"></script>
     <script src="js/contract-abi.js"></script>
     <script src="js/app.js"></script>
 </body>
-</html>"},{
+</html>

@@ -137,8 +137,20 @@ const Web3Config = {
     handleDisconnect() {
         this.account = null;
         console.log('Wallet disconnected');
-        document.getElementById('connect-wallet').style.display = 'block';
-        document.getElementById('account-info').style.display = 'none';
+        // UI fallbacks (some elements may not exist in markup)
+        const connectBtn = document.getElementById('connect-wallet');
+        const logoutBtn = document.getElementById('logout-btn');
+        const acctAddr = document.getElementById('account-address');
+        const ethBal = document.getElementById('eth-balance');
+        const headerBal = document.getElementById('header-balance');
+        const walletShort = document.getElementById('wallet-short');
+
+        if (connectBtn) connectBtn.style.display = 'block';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (acctAddr) acctAddr.textContent = 'Not connected';
+        if (ethBal) ethBal.textContent = '0.0000';
+        if (headerBal) headerBal.textContent = '0.0000 ETH';
+        if (walletShort) walletShort.textContent = '(Wallet: Not connected)';
     },
     
     /**
@@ -150,13 +162,24 @@ const Web3Config = {
         // Get ETH balance
         const balance = await this.web3.eth.getBalance(this.account);
         const ethBalance = this.web3.utils.fromWei(balance, 'ether');
+        const displayBalance = parseFloat(ethBalance).toFixed(4);
         
-        // Update UI
-        document.getElementById('account-address').textContent = 
-            this.account.substring(0, 6) + '...' + this.account.substring(38);
-        document.getElementById('network-name').textContent = this.getNetworkName();
-        document.getElementById('eth-balance').textContent = 
-            parseFloat(ethBalance).toFixed(4);
+        // Update UI (safely check elements exist)
+        const acctAddr = document.getElementById('account-address');
+        const ethBal = document.getElementById('eth-balance');
+        const headerBal = document.getElementById('header-balance');
+        const walletShort = document.getElementById('wallet-short');
+        const connectBtn = document.getElementById('connect-wallet');
+        const logoutBtn = document.getElementById('logout-btn');
+        const networkElem = document.getElementById('network-name');
+
+        if (acctAddr) acctAddr.textContent = this.account.substring(0, 6) + '...' + this.account.substring(38);
+        if (ethBal) ethBal.textContent = displayBalance;
+        if (headerBal) headerBal.textContent = displayBalance + ' ETH';
+        if (walletShort) walletShort.textContent = `(Wallet: ${this.formatAddress(this.account)})`;
+        if (networkElem) networkElem.textContent = this.getNetworkName();
+        if (connectBtn) connectBtn.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'block';
     },
     
     /**

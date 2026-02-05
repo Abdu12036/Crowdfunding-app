@@ -35,5 +35,8 @@ module.exports = {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts"
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY || ""
   }
 };

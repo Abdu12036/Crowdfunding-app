@@ -3,7 +3,6 @@ node_modules/
 
 # Environment files (do NOT commit private keys or API URLs)
 .env
-.env.*
 
 # Hardhat build artifacts and cache
 artifacts/

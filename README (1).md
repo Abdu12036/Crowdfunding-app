@@ -2,7 +2,7 @@
 
 A fully functional decentralized crowdfunding application built on Ethereum with ERC-20 reward tokens. This project demonstrates smart contract development, blockchain interaction, and DApp architecture.
 
-## 🎯 Project Overview
+## Project Overview
 
 This application enables users to:
 - Create crowdfunding campaigns with specific goals and deadlines
@@ -11,7 +11,7 @@ This application enables users to:
 - Finalize campaigns after deadlines
 - Track all contributions and campaign progress on-chain
 
-## 🏗️ Architecture
+## Architecture
 
 ### Smart Contracts
 
@@ -67,7 +67,7 @@ This application enables users to:
 - Test ETH from a faucet
 - Git
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### 1. Clone the Repository
 
@@ -103,13 +103,9 @@ PRIVATE_KEY=your_metamask_private_key
 You need test ETH to deploy contracts and interact with the application.
 
 **Sepolia Faucets:**
+- https://cloud.google.com/application/web3/faucet/ethereum/sepolia
 - https://sepoliafaucet.com/
-- https://www.alchemy.com/faucets/ethereum-sepolia
 - https://faucet.quicknode.com/ethereum/sepolia
-
-**Holesky Faucets:**
-- https://holesky-faucet.pk910.de/
-- https://faucet.quicknode.com/ethereum/holesky
 
 **Local Network:**
 - Hardhat provides test accounts with 10000 ETH each
@@ -134,12 +130,6 @@ npm run deploy:local
 
 ```bash
 npm run deploy:sepolia
-```
-
-### Option 3: Holesky Testnet
-
-```bash
-npm run deploy:holesky
 ```
 
 ### Post-Deployment Steps
@@ -216,28 +206,6 @@ Then open: http://localhost:8000
 - Funds are transferred to campaign creator
 - Campaign marked as complete
 
-## 🧪 Testing
-
-### Manual Testing Checklist
-
-- [ ] Connect wallet successfully
-- [ ] View correct network and balance
-- [ ] Create a new campaign
-- [ ] View created campaign in the list
-- [ ] Contribute to a campaign
-- [ ] Verify CRT token balance increases
-- [ ] Wait for deadline or change local time
-- [ ] Finalize expired campaign
-- [ ] Verify funds transferred to creator
-
-### Automated Tests (Optional)
-
-Create test files in the `test` folder:
-
-```bash
-npm test
-```
-
 ## 📊 Smart Contract Functions
 
 ### Crowdfunding Contract
@@ -285,91 +253,6 @@ blockchain-crowdfunding/
 └── README.md                  # This file
 ```
 
-## 🔐 Security Considerations
-
-### Smart Contract Security
-
-- ✅ Input validation on all functions
-- ✅ Deadline enforcement
-- ✅ Finalization checks prevent double-spending
-- ✅ No reentrancy vulnerabilities
-- ✅ Proper access control
-
-### Frontend Security
-
-- ✅ Client-side validation
-- ✅ Network verification
-- ✅ Transaction confirmation displays
-- ✅ Error handling
-
-### Best Practices Implemented
-
-- Owner-only minting for reward tokens
-- Campaign state management
-- Contribution tracking per user
-- Safe ETH transfer mechanisms
-
-## 🐛 Troubleshooting
-
-### MetaMask Not Detected
-
-- Ensure MetaMask is installed and enabled
-- Refresh the page
-- Check browser console for errors
-
-### Wrong Network
-
-- Open MetaMask
-- Switch to Sepolia, Holesky, or Localhost network
-- Refresh the application
-
-### Transaction Failed
-
-- Check you have enough test ETH for gas fees
-- Verify contract address is correct
-- Ensure campaign hasn't expired (for contributions)
-- Check browser console for error details
-
-### Contract Not Found
-
-- Verify CONTRACT_ADDRESS in contract-abi.js
-- Ensure contract is deployed to current network
-- Check network ID matches deployment network
-
-### Insufficient Funds
-
-- Get more test ETH from faucets
-- For local network, use provided test accounts
-
-## 🎓 Educational Value
-
-This project demonstrates:
-
-1. **Solidity Development**
-   - Smart contract architecture
-   - ERC-20 token implementation
-   - State management
-   - Event emission
-
-2. **Web3 Integration**
-   - MetaMask connection
-   - Transaction signing
-   - Contract interaction
-   - Event listening
-
-3. **DApp Architecture**
-   - Frontend-blockchain communication
-   - Wallet integration
-   - Network handling
-   - User experience design
-
-4. **Blockchain Concepts**
-   - Decentralization
-   - Trustless transactions
-   - Immutable records
-   - Tokenization
-
-## 📝 Development Notes
 
 ### Token Economics
 
@@ -384,45 +267,5 @@ This project demonstrates:
 2. **Active**: Before deadline, accepting contributions
 3. **Expired**: Past deadline, awaiting finalization
 4. **Finalized**: Completed, funds transferred to creator
-
-### Gas Optimization
-
-- Optimized storage usage
-- Efficient loops avoided
-- Batch operations where possible
-
-## 🔄 Future Enhancements
-
-Potential improvements for extended versions:
-
-- Campaign categories/tags
-- Search and filter functionality
-- Campaign updates/milestones
-- Refund mechanism for failed campaigns
-- Governance features for token holders
-- IPFS integration for campaign media
-- Multi-token support
-- Staking mechanisms
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- OpenZeppelin for smart contract patterns
-- Ethereum community for development tools
-- MetaMask for wallet integration
-- Hardhat for development framework
-
-## 📞 Support
-
-For issues or questions:
-1. Check the troubleshooting section
-2. Review browser console for errors
-3. Verify all setup steps completed
-4. Check network and account status
-
----
 
 **⚠️ IMPORTANT DISCLAIMER**: This application is for educational purposes only. Use only test networks and test tokens. Never use real cryptocurrency or deploy to mainnet without proper security audits.
