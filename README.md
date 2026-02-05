@@ -127,7 +127,7 @@ npm run deploy:local
 ```
 
 ### Option 2: Sepolia Testnet
-
+git
 ```bash
 npm run deploy:sepolia
 ```
